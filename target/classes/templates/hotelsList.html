@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="template"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Hotels List</title>
+    <link rel="stylesheet" href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css"/>
+    <script type="text/javascript" src="/webjars/bootstrap/5.3.3/js/bootstrap.bundle.js"></script>
+    <script type="text/javascript" src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="p-3 m-2 ">
+        <div class="mx-auto max-w-md mb-5">
+            <form method="get" th:action="@{hotelsList}" class="relative">
+                <label for="search"
+                       class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                    </svg>
+                </div>
+                <input type="search" th:value="${keyword}" name="search" id="search"
+                       class="block w-full pl-10 pr-12 py-4 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                       placeholder="Search"/>
+                <button type="submit"
+                        class="text-white absolute right-2.5 top-1/2 transform -translate-y-1/2 bg-gray-800 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 duration-300">
+                    Search
+                </button>
+            </form>
+        </div>
+        <div class="mb-8 flex justify-center mt-8" sec:authorize="isAuthenticated()">
+            <a th:href="@{/addHotel}"
+               class="bg-gray-800 text-white py-2 px-4 rounded-lg transition-colors duration-300 hover:bg-gray-600">Add
+                Hotel</a>
+        </div>
+        <div th:if="${param.success}" class="alert alert-success">
+            You are registered successfuly
+        </div>
+        <div class="container mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div th:each="hotel : ${hotels}" class="bg-gray-100 border rounded-lg p-4">
+                    <a th:href="@{roomsList(idHotel=${hotel.getId()})}"
+                       class="bg-gray-100 border rounded-lg p-4 block hover:bg-gray-200 transition duration-300">
+                        <img th:src="@{'/img/' + ${hotel.getImageFileName()}}" alt="Hotel Image"
+                             class="w-full h-40 object-cover rounded-t-lg mb-4">
+                        <div class="text-lg font-semibold mb-2">Hotel: <span th:text="${hotel.getName()}"></span></div>
+                        <div class="mb-2">City: <span th:text="${hotel.getCity()}"></span></div>
+                        <div class="mb-2">Address: <span th:text="${hotel.getAddress()}"></span></div>
+                    </a>
+                    <div class="flex justify-between" sec:authorize="isAuthenticated()">
+                        <div class="p-2 text-bg-dark bg-gray-800 text-white py-2 px-4 rounded-lg transition-colors duration-300 hover:bg-gray-600">
+                            <a th:href="@{updateHotel(id=${hotel.getId()})}" class="flex items-center">
+                                <span class="ml-2">Update</span>
+                            </a>
+                        </div>
+                        <div class="p-2 text-bg-dark bg-gray-800 text-danger py-2 px-4 rounded-lg transition-colors duration-300 hover:bg-gray-600">
+                            <a onclick="confirm('Are you sure !!!')" th:href="@{deleteHotel(id=${hotel.getId()})}"
+                               class="flex items-center">
+                                <span class="ml-2">Delete</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="container mx-auto mt-4">
+        <ul class="flex justify-center">
+            <li th:each="page, stat : ${pages}" class="mr-2">
+                <a th:class="${stat.index eq currentPage ?'btn bg-gray-800 text-white py-2 px-4 rounded-lg transition-colors duration-300 hover:bg-gray-600':' btn bg-gray-200 text-gray-800 py-2 px-4 rounded-lg transition-colors duration-300 hover:bg-gray-300' }"
+                   th:text="${stat.index}" th:href="@{hotelsList(page=${stat.index},search=${keyword})}"></a>
+            </li>
+        </ul>
+    </div>
+
+</div>
+</body>
+</html>
